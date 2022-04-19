@@ -3,12 +3,13 @@ package github
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"github.com/htenjo/gh_statistics/config"
 	"log"
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/gin-gonic/gin"
+	"github.com/htenjo/gh_statistics/config"
 )
 
 const (
@@ -48,7 +49,7 @@ func GetOpenPRs(repoName, accessToken string, channel chan RepoPRResponse) {
 		return
 	}
 
-	repoUrl := config.GhApiBase() + strings.TrimSpace(repoName) + "/pulls?state=open&sort=updated"
+	repoUrl := "https://api.github.com/repos/mercadolibre/" + strings.TrimSpace(repoName) + "/pulls?state=open&sort=updated"
 	var openPullRequests []PullRequestDetail
 	jsonRequest(repoUrl, accessToken, &openPullRequests)
 	assignPrOpenFlags(&openPullRequests)

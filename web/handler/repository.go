@@ -1,15 +1,15 @@
 package handler
 
 import (
+	"log"
+	"net/http"
+	"strings"
+
 	"github.com/gin-gonic/gin"
-	"github.com/htenjo/gh_statistics/config"
 	"github.com/htenjo/gh_statistics/definition"
 	"github.com/htenjo/gh_statistics/github"
 	"github.com/htenjo/gh_statistics/repository"
 	"github.com/htenjo/gh_statistics/slack"
-	"log"
-	"net/http"
-	"strings"
 )
 
 const ReposPath = "/repos"
@@ -57,26 +57,15 @@ func (h *RepoHandler) SendOpenPRNotification(c *gin.Context) {
 
 // SendPRNotification Temp handler for easy job notifications
 func (h *RepoHandler) SendPRNotification(c *gin.Context) {
-	sessionId := c.GetHeader("x-session-id")
-	authToken := c.GetHeader("x-cron-token")
-
-	if sessionId == "" {
-		c.JSON(400, gin.H{"message": "Required header not found"})
-		return
-	}
-
-	if authToken != config.AuthTempToken() {
-		c.JSON(401, gin.H{"message": "User not authorized"})
-		return
-	}
-
-	c.Set(definition.SessionId, sessionId)
 	h.SendOpenPRNotification(c)
 }
 
 func (h *RepoHandler) getOpenPRInformation(c *gin.Context) []github.RepoPR {
-	sessionId := c.GetString(definition.SessionId)
-	user, _ := h.store.Find(sessionId)
+	user := repository.User{
+		AccessToken: "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",
+		Repos:       "fury_mp-point-integration-apigw,fury_mp-point-devices-api,fury_mp-point-integration-admin,fury_mp-point-integration-admin-api,fury_mp-point-integration-api-sec,fury_mp-point-integration-legacy,fury_mp-point-integrator-api,fury_mp-point-integrator-simulator,fury_mp-point-payment-intent-api,fury_mp-point-sdk-commons",
+	}
+
 	repos := strings.Split(user.Repos, ",")
 
 	info := make([]github.RepoPR, 0)
