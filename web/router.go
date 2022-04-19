@@ -24,7 +24,7 @@ func Init(store *repository.UserRepository) {
 	router.POST(handler.ReposPath, authGuard, repoHandler.CreateRepos)
 	router.POST(handler.ReposOpenPRNotification, authGuard, repoHandler.SendOpenPRNotification)
 
-	if err := router.Run(":8080"); err != nil {
+	if err := router.Run(":8090"); err != nil {
 		panic(err)
 	}
 }

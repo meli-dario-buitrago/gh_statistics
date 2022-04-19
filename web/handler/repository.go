@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/htenjo/gh_statistics/config"
 	"github.com/htenjo/gh_statistics/definition"
 	"github.com/htenjo/gh_statistics/github"
 	"github.com/htenjo/gh_statistics/repository"
@@ -62,10 +63,9 @@ func (h *RepoHandler) SendPRNotification(c *gin.Context) {
 
 func (h *RepoHandler) getOpenPRInformation(c *gin.Context) []github.RepoPR {
 	user := repository.User{
-		AccessToken: "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",
-		Repos:       "fury_mp-point-integration-apigw,fury_mp-point-devices-api,fury_mp-point-integration-admin,fury_mp-point-integration-admin-api,fury_mp-point-integration-api-sec,fury_mp-point-integration-legacy,fury_mp-point-integrator-api,fury_mp-point-integrator-simulator,fury_mp-point-payment-intent-api,fury_mp-point-sdk-commons",
+		AccessToken: config.GetAccessToken(),
+		Repos:       "fury_mp-point-integration-apigw,fury_mp-point-devices-api,fury_mp-point-integration-admin,fury_mp-point-integration-admin-api,fury_mp-point-integration-api-sec,fury_mp-point-integration-legacy,fury_mp-point-integrator-api,fury_mp-point-integrator-simulator,fury_mp-point-payment-intent-api,fury_mp-point-sdk-commons,",
 	}
-
 	repos := strings.Split(user.Repos, ",")
 
 	info := make([]github.RepoPR, 0)

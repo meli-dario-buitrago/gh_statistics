@@ -2,11 +2,12 @@ package config
 
 import (
 	"database/sql"
-	"github.com/htenjo/gh_statistics/repository"
-	"github.com/spf13/viper"
 	"log"
 	"os"
 	"strconv"
+
+	"github.com/htenjo/gh_statistics/repository"
+	"github.com/spf13/viper"
 )
 
 const (
@@ -15,6 +16,7 @@ const (
 
 	ghClientId       = "GH_CLIENT_ID"
 	ghClientSecret   = "GH_CLIENT_SECRET"
+	ghAccessToken    = "GH_ACCESS_TOKEN"
 	ghAuthorizeUrl   = "GH_AUTHORIZE_URL"
 	ghUserApiUrl     = "GH_API_USER_URL"
 	ghApiBase        = "GH_API_REPO_URL"
@@ -70,6 +72,10 @@ func GhClientId() string {
 
 func GhClientSecret() string {
 	return getValue(ghClientSecret)
+}
+
+func GetAccessToken() string {
+	return getValue(ghAccessToken)
 }
 
 func GhAuthorizeUrl() string {
