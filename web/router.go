@@ -19,7 +19,7 @@ func Init(store *repository.UserRepository) {
 
 	router.GET("/ping", middleware.Ping)
 	router.GET("/callback", authHandler.CallbackHandler)
-	router.POST("/repos/pr/notification", repoHandler.SendPRNotification)
+	router.GET("/repos/pr/notification", repoHandler.SendPRNotification)
 	authGuard := middleware.Authenticate(store)
 
 	router.GET("/", authGuard, handler.IndexHandler)
