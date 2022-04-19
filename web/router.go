@@ -1,7 +1,10 @@
 package web
 
 import (
+	"fmt"
+
 	"github.com/gin-gonic/gin"
+	"github.com/htenjo/gh_statistics/config"
 	"github.com/htenjo/gh_statistics/repository"
 	"github.com/htenjo/gh_statistics/web/handler"
 	"github.com/htenjo/gh_statistics/web/middleware"
@@ -24,7 +27,11 @@ func Init(store *repository.UserRepository) {
 	router.POST(handler.ReposPath, authGuard, repoHandler.CreateRepos)
 	router.POST(handler.ReposOpenPRNotification, authGuard, repoHandler.SendOpenPRNotification)
 
-	if err := router.Run(":8090"); err != nil {
+	if err := router.Run(port()); err != nil {
 		panic(err)
 	}
+}
+
+func port() string {
+	return fmt.Sprintf(":%d", config.WebPort())
 }
