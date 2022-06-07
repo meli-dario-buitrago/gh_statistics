@@ -25,3 +25,8 @@ type ButtonSection struct {
 type WebhookMessage struct {
 	Blocks []interface{} `json:"blocks"`
 }
+
+type FieldBlock struct {
+	Type   string          `json:"type"`
+	Fields []PlanTextBlock `json:"fields"`
+}

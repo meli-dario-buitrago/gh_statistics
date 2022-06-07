@@ -52,3 +52,8 @@ type RepoPRResponse struct {
 	Repo  RepoPR
 	Error error
 }
+
+type Collaborator struct {
+	Name string `json:"name"`
+	ID   string `json:"id"`
+}

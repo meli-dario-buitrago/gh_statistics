@@ -4,17 +4,26 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/htenjo/gh_statistics/config"
-	"github.com/htenjo/gh_statistics/github"
 	"io/ioutil"
 	"log"
 	"math"
 	"net/http"
+
+	"github.com/htenjo/gh_statistics/config"
+	"github.com/htenjo/gh_statistics/github"
 )
 
 var (
-	DangerStyle  = "danger"
-	PrimaryStyle = "primary"
+	DangerStyle   = "danger"
+	PrimaryStyle  = "primary"
+	helloMessage  = "<!here> :sunny: Buenos días equipo, *¡¡es hora del daily!!*, nuestros facilitadores hoy son:"
+	collaborators = []github.Collaborator{
+		{Name: "Mary", ID: "U01CENY63K2"},
+		{Name: "Angie", ID: "U0370NNMWDA"},
+		{Name: "Dario", ID: "U01KGU0TSHZ"},
+		{Name: "Pierre", ID: "U01NYBUUV7D"},
+		{Name: "Steven", ID: "U01ML2N7QM6"},
+	}
 )
 
 func NewPlainTextBlock(text string) PlanTextBlock {
@@ -109,4 +118,60 @@ func sendNotification(message []byte) {
 	defer resp.Body.Close()
 
 	fmt.Println(string(bodyText))
+}
+
+func SendDailyReminderMessage() {
+	message := WebhookMessage{}
+	helloSection := NewMarkDownSection(helloMessage)
+	gopherbotsBlock := NewFieldsSection(getTodayGopherbots(config.GetCollaboratorIndex(len(collaborators))))
+	linksSection := NewMarkDownSection("Nuestros enlaces...")
+	linksBlock := NewFieldsSection(getLinks())
+
+	message.Blocks = append(message.Blocks, helloSection, gopherbotsBlock, linksSection, linksBlock)
+	byteResponse, _ := json.MarshalIndent(message, "", "  ")
+	sendNotification(byteResponse)
+}
+
+func getTodayGopherbots(collaboratorIndex int) []PlanTextBlock {
+	alternateIndex := (collaboratorIndex + 2) % len(collaborators)
+	fmt.Println("El colaborador es:", collaborators[collaboratorIndex].Name)
+	var todayGopherbotsBlock []PlanTextBlock
+	todayGopherbotsBlock = append(todayGopherbotsBlock,
+		NewMarkDownBlock(fmt.Sprintf("*Presentador:*\n<@%s>", collaborators[collaboratorIndex].ID)),
+		NewMarkDownBlock(fmt.Sprintf("*Suplente:*\n<@%s>", collaborators[alternateIndex].ID)),
+	)
+
+	return todayGopherbotsBlock
+}
+
+func getLinks() []PlanTextBlock {
+	var linksBlock []PlanTextBlock
+
+	linksBlock = append(linksBlock,
+		NewMarkDownBlock(":jira: *<https://mercadolibre.atlassian.net/jira/software/projects/SDK/boards/3802|Tablero Jira>* :jira:"),
+		NewMarkDownBlock(":meet: *<https://meet.google.com/mbs-hgob-fdf|Meet>* :meet:"),
+	)
+
+	return linksBlock
+}
+
+func NewMarkDownBlock(text string) PlanTextBlock {
+	return PlanTextBlock{
+		Type: "mrkdwn",
+		Text: text,
+	}
+}
+
+func NewMarkDownSection(text string) HeaderBlock {
+	return HeaderBlock{
+		Type: "section",
+		Text: NewMarkDownBlock(text),
+	}
+}
+
+func NewFieldsSection(fields []PlanTextBlock) FieldBlock {
+	return FieldBlock{
+		Type:   "section",
+		Fields: fields,
+	}
 }

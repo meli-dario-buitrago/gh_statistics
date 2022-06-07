@@ -88,3 +88,7 @@ func (h *RepoHandler) getOpenPRInformation(c *gin.Context) []github.RepoPR {
 
 	return info
 }
+
+func (h *RepoHandler) NotifyDailyReminder(c *gin.Context) {
+	slack.SendDailyReminderMessage()
+}
