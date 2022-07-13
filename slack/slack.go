@@ -7,10 +7,12 @@ import (
 	"io/ioutil"
 	"log"
 	"math"
+	"math/rand"
 	"net/http"
 
 	"github.com/htenjo/gh_statistics/config"
 	"github.com/htenjo/gh_statistics/github"
+	"github.com/htenjo/gh_statistics/opsgenie"
 )
 
 var (
@@ -18,11 +20,11 @@ var (
 	PrimaryStyle  = "primary"
 	helloMessage  = "<!here> :sunny: Buenos días equipo, *¡¡es hora del daily!!*, nuestros facilitadores hoy son:"
 	collaborators = []github.Collaborator{
-		{Name: "Mary", ID: "U01CENY63K2"},
-		{Name: "Angie", ID: "U0370NNMWDA"},
-		{Name: "Dario", ID: "U01KGU0TSHZ"},
-		{Name: "Pierre", ID: "U01NYBUUV7D"},
-		{Name: "Steven", ID: "U01ML2N7QM6"},
+		{Name: "Mary", ID: "U01CENY63K2", EMail: "mary.velandia@mercadolibre.com.co"},
+		{Name: "Angie", ID: "U0370NNMWDA", EMail: "angie.camelo@mercadolibre.com.co"},
+		{Name: "Dario", ID: "U01KGU0TSHZ", EMail: "dario.buitragocorredor@mercadolibre.com.co"},
+		{Name: "Pierre", ID: "U01NYBUUV7D", EMail: "etienne.pradere@mercadolibre.com.co"},
+		{Name: "Steven", ID: "U01ML2N7QM6", EMail: "steven.ossaserna@mercadolibre.com.co"},
 	}
 )
 
@@ -120,20 +122,32 @@ func sendNotification(message []byte) {
 	fmt.Println(string(bodyText))
 }
 
-func SendDailyReminderMessage() {
+func SendDailyReminderMessage(onCallUsers opsgenie.OnCallUsersResponse) {
 	message := WebhookMessage{}
 	helloSection := NewMarkDownSection(helloMessage)
-	gopherbotsBlock := NewFieldsSection(getTodayGopherbots(config.GetCollaboratorIndex(len(collaborators))))
+	gopherbotsBlock := NewFieldsSection(getTodayGopherbots(rand.Intn(len(collaborators))))
+	questionsBlock := NewMarkDownSection("*Preparate para contarnos:*\n - Qué se hizo ayer?\n - Qué planeas hacer hoy?\n - Algún bloqueante?\n - Si hubo alertas, qué análisis hicimos sobre estas?\n")
+	opsGenieSection := NewMarkDownSection(fmt.Sprintf("*Guardias*\n Principal: <@%s>\n BackUp: <@%s>",
+		getSlackIDByEmail(onCallUsers.Main.EMail), getSlackIDByEmail(onCallUsers.BackUp.EMail)))
 	linksSection := NewMarkDownSection("Nuestros enlaces...")
 	linksBlock := NewFieldsSection(getLinks())
 
-	message.Blocks = append(message.Blocks, helloSection, gopherbotsBlock, linksSection, linksBlock)
+	message.Blocks = append(message.Blocks, helloSection, gopherbotsBlock, questionsBlock, opsGenieSection, linksSection, linksBlock)
 	byteResponse, _ := json.MarshalIndent(message, "", "  ")
 	sendNotification(byteResponse)
 }
 
+func getSlackIDByEmail(email string) string {
+	for i := range collaborators {
+		if collaborators[i].EMail == email {
+			return collaborators[i].ID
+		}
+	}
+	return ""
+}
+
 func getTodayGopherbots(collaboratorIndex int) []PlanTextBlock {
-	alternateIndex := (collaboratorIndex + 2) % len(collaborators)
+	alternateIndex := (collaboratorIndex + rand.Intn(len(collaborators)-1)) % len(collaborators)
 	fmt.Println("El colaborador es:", collaborators[collaboratorIndex].Name)
 	var todayGopherbotsBlock []PlanTextBlock
 	todayGopherbotsBlock = append(todayGopherbotsBlock,
@@ -150,6 +164,7 @@ func getLinks() []PlanTextBlock {
 	linksBlock = append(linksBlock,
 		NewMarkDownBlock(":jira: *<https://mercadolibre.atlassian.net/jira/software/projects/SDK/boards/3802|Tablero Jira>* :jira:"),
 		NewMarkDownBlock(":meet: *<https://meet.google.com/mbs-hgob-fdf|Meet>* :meet:"),
+		NewMarkDownBlock(":excell: *<https://docs.google.com/spreadsheets/d/1pcmWDQRL9CCyX3I-EyL1pdFKUhn9jAzf1rD3yUqWhsA/edit?usp=sharing|Bitacora alertas>* :excell:"),
 	)
 
 	return linksBlock

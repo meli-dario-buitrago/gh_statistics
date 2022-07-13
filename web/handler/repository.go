@@ -9,6 +9,7 @@ import (
 	"github.com/htenjo/gh_statistics/config"
 	"github.com/htenjo/gh_statistics/definition"
 	"github.com/htenjo/gh_statistics/github"
+	"github.com/htenjo/gh_statistics/opsgenie"
 	"github.com/htenjo/gh_statistics/repository"
 	"github.com/htenjo/gh_statistics/slack"
 )
@@ -90,5 +91,10 @@ func (h *RepoHandler) getOpenPRInformation(c *gin.Context) []github.RepoPR {
 }
 
 func (h *RepoHandler) NotifyDailyReminder(c *gin.Context) {
-	slack.SendDailyReminderMessage()
+	accessToken := config.GetOGAccessToken()
+	ogChannel := make(chan opsgenie.OnCallUsersResponse)
+	go opsgenie.GetYesterdayOnCallUsers(accessToken, ogChannel)
+	ogResponse := <-ogChannel
+
+	slack.SendDailyReminderMessage(ogResponse)
 }

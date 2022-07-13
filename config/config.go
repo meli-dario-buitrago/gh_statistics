@@ -2,7 +2,6 @@ package config
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
 	"os"
 	"strconv"
@@ -23,12 +22,11 @@ const (
 	ghApiBase        = "GH_API_REPO_URL"
 	ghCallbackUrl    = "GH_AUTH_CALLBACK_URL"
 	ghAccessTokenUrl = "GH_ACCESS_TOKEN_URL"
+	ogAccessToken    = "OG_ACCESS_TOKEN"
 
 	slackWebhookUsePrivate = "SLACK_WEBHOOK_USE_PRIVATE"
 	slackPrivateWebhookUrl = "SLACK_PRIVATE_WEBHOOK_URL"
 	slackBackendWebhookUlr = "SLACK_BACKEND_WEBHOOK_URL"
-
-	collaboratorIndexKey = "COLLABORATOR_INDEX"
 
 	webPort = "PORT"
 )
@@ -81,6 +79,10 @@ func GetAccessToken() string {
 	return getValue(ghAccessToken)
 }
 
+func GetOGAccessToken() string {
+	return getValue(ogAccessToken)
+}
+
 func GhAuthorizeUrl() string {
 	return getValue(ghAuthorizeUrl)
 }
@@ -107,12 +109,6 @@ func SlackWebhookUrl() string {
 	}
 
 	return getValue(slackBackendWebhookUlr)
-}
-
-func GetCollaboratorIndex(collaboratorsQuantity int) int {
-	collaboratorIndex := getValueInt(collaboratorIndexKey)
-	os.Setenv(collaboratorIndexKey, fmt.Sprintf("%d", ((collaboratorIndex+1)%collaboratorsQuantity)))
-	return collaboratorIndex
 }
 
 func WebPort() int {

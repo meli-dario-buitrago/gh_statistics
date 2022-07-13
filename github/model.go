@@ -54,6 +54,7 @@ type RepoPRResponse struct {
 }
 
 type Collaborator struct {
-	Name string `json:"name"`
-	ID   string `json:"id"`
+	Name  string `json:"name"`
+	ID    string `json:"id"`
+	EMail string `json:"email"`
 }
