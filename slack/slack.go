@@ -147,7 +147,7 @@ func getSlackIDByEmail(email string) string {
 }
 
 func getTodayGopherbots(collaboratorIndex int) []PlanTextBlock {
-	alternateIndex := (collaboratorIndex + rand.Intn(len(collaborators)-1)) % len(collaborators)
+	alternateIndex := (collaboratorIndex + rand.Intn(len(collaborators)-2) + 1) % len(collaborators)
 	fmt.Println("El colaborador es:", collaborators[collaboratorIndex].Name)
 	var todayGopherbotsBlock []PlanTextBlock
 	todayGopherbotsBlock = append(todayGopherbotsBlock,
