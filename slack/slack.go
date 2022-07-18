@@ -9,6 +9,7 @@ import (
 	"math"
 	"math/rand"
 	"net/http"
+	"time"
 
 	"github.com/htenjo/gh_statistics/config"
 	"github.com/htenjo/gh_statistics/github"
@@ -123,6 +124,7 @@ func sendNotification(message []byte) {
 }
 
 func SendDailyReminderMessage(onCallUsers opsgenie.OnCallUsersResponse) {
+	rand.Seed(time.Now().UnixNano())
 	message := WebhookMessage{}
 	helloSection := NewMarkDownSection(helloMessage)
 	gopherbotsBlock := NewFieldsSection(getTodayGopherbots(rand.Intn(len(collaborators))))
